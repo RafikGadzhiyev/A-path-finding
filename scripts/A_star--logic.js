@@ -40,6 +40,10 @@ export function getCellNeighbors(grid, row, col) {
 
 		neighborCell.parent = [row, col]
 
+		if (neighborCell.value !== 3) {
+			neighborCell.value = 5
+		}
+
 		neighbors.push(
 			[
 				neighborRow, neighborCol
@@ -48,4 +52,56 @@ export function getCellNeighbors(grid, row, col) {
 	}
 
 	return neighbors
+}
+
+export function processGrid(grid, queue) {
+	const nextTick = [];
+
+	while (queue.length) {
+		const [
+			row, col
+		] = queue.shift()
+
+		const cell = grid[row][col]
+
+		if (cell.isChecked) {
+			continue;
+		}
+
+		if (cell.value === 3) {
+			while(queue.length && queue.pop());
+
+			const path = getPath(grid, cell);
+
+			return path;
+		}
+
+		cell.value = cell.value === 1
+			? cell.value
+			: 2;
+		cell.isChecked = true
+
+
+		const nCells = getCellNeighbors(grid, row, col)
+
+		nextTick.push(
+			...nCells
+		)
+	}
+
+	queue.push(
+		...nextTick
+	)
+}
+
+export function getPath(grid, cell) {
+	const path = [];
+
+	while (cell.parent) {
+		path.push(cell.parent)
+
+		cell = grid[cell.parent[0]][cell.parent[1]]
+	}
+
+	return path
 }

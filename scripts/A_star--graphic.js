@@ -13,10 +13,14 @@ export function createGrid(cellSize, canvasSize) {
 	const rows = Math.floor(canvasSize.height / cellSize)
 	const cols = Math.floor(canvasSize.width / cellSize)
 
+	let hasStart = false;
+	let hasFinish = false;
+
 	for (let i = 0; i < rows; ++i) {
 		grid.push([])
 
 		for (let j = 0; j < cols; ++j) {
+			let randomNumber = Math.random();
 			let randomCellValue = getRandomCellValue()
 
 			const cell = {
@@ -25,11 +29,13 @@ export function createGrid(cellSize, canvasSize) {
 				parent: null,
 			}
 
-			if (i === 0 && j === 0) {
+			if (randomNumber > 0.9 && !hasStart) {
 				cell.value = 1;
+				hasStart = true;
 			}
-			else if (i === rows - 1 && j === cols - 1){
-				cell.value = 2;
+			else if (randomNumber > 0.9 && !hasFinish){
+				cell.value = 3;
+				hasFinish = true
 			}
 
 			grid[grid.length - 1].push(cell)
@@ -41,7 +47,7 @@ export function createGrid(cellSize, canvasSize) {
 
 export function getRandomCellValue() {
 	const values = [
-		0, 0, 0, 0,
+		0, 0, 0,
 		-1
 	]
 
@@ -67,18 +73,31 @@ export function drawGridCell(ctx, cell, row, col, cellSize) {
 			drawEmptyCell(ctx, x, y, cellSize, cellSize);
 			break;
 
-		// case 1:
 		case 2:
 			drawFullCell(ctx, x, y, cellSize, cellSize, '#00ffaf')
 			break;
 
+		case 1:
 		case 3:
 			drawFullCell(ctx, x, y, cellSize, cellSize, '#37a2a2')
+			break;
+
+		case 5:
+			drawFullCell(ctx, x, y, cellSize, cellSize, '#009eff')
 			break;
 
 		case -1:
 			drawFullCell(ctx, x, y, cellSize, cellSize);
 			break;
+	}
+}
+
+export function visualizePath(grid, path) {
+	while (path.length) {
+		const [row, col] = path.pop();
+
+		grid[row][col].value = 3;
+
 	}
 }
 

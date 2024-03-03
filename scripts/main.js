@@ -5,14 +5,13 @@ import {
 } from "./canvas.js";
 import {
 	createGrid,
-	drawGrid
+	drawGrid,
 } from "./A_star--graphic.js";
-import {getCellNeighbors} from "./A_star--logic.js";
+import {processGrid} from "./A_star--logic.js";
 
 const CONFIG = {
-	CELL_SIZE: 40,
+	CELL_SIZE: 25,
 }
-
 
 const {
 	canvas,
@@ -33,40 +32,43 @@ const grid = createGrid(
 	}
 )
 
-let queue = [
-	[0, 0]
-]
+let queue = [];
+
+for (let i = 0; i < grid.length; i++) {
+	for (let j = 0; j < grid[i].length; j++) {
+		if (grid[i][j].value === 1) {
+			queue.push(
+				[
+					i, j
+				]
+			)
+
+			break;
+		}
+	}
+}
+
+const shortestPathCells = [];
 
 function init() {
 	clearCanvas(ctx, CANVAS_WIDTH, CANVAS_HEIGHT)
 	drawGrid(ctx, grid, CONFIG.CELL_SIZE)
 
-	const nextTick = [];
+	const shortestPath = processGrid(grid, queue)
 
-	while (queue.length) {
-		const [
-			row, col
-		] = queue.shift()
+	if (shortestPath) {
+		shortestPathCells.push(
+			...shortestPath
+		)
+	}
 
-		const cell = grid[row][col]
+	if (shortestPathCells.length) {
+		const [row, col] = shortestPathCells.shift()
 
-		if (cell.isChecked) {
-			continue;
-		}
+		grid[row][col].value = 3;
+	}
 
-		cell.value = 2;
-		cell.isChecked = true
-
-
-		const nCells = getCellNeighbors(grid, row, col)
-
-		nextTick.push(
-			...nCells
-			)
-		}
-
-	queue = nextTick
-	setTimeout(() => init(), 100)
+	setTimeout(() => init(), 50)
 }
 
 init()
